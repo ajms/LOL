@@ -51,7 +51,7 @@ elseif circle == 0
 end    
 phi = init(phi);
 
-options.Method = 'sd';
+options.Method = 'csd';
 x = minFunc(@lol,phi(:),options);
 hold on;
 imagesc(usmooth);
