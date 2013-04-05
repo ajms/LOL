@@ -41,7 +41,7 @@ phi = -ones(M,N);
 if circle == 1
     [X Y] = meshgrid(1:M);
     phip = (X-50).^2 + (Y-50).^2; 
-    phi(phip <= 10^2) = 1;
+    phi(phip <= 30^2) = 1;
 elseif circle == 0
     phip = zeros(M,N);
     for i=umin:0.005:umean
@@ -49,12 +49,18 @@ elseif circle == 0
     end
     phi(phip >= 0.5) = 1;
 end    
+
 phi = init(phi);
 
-options.Method = 'csd';
-x = minFunc(@lol,phi(:),options);
-hold on;
-imagesc(usmooth);
-contour(phi, [0 0]);
-contour(reshape(x,M,N), [0 0]);
-hold off;
+options.Method = 'lbfgs';
+options.MaxIter=1000;
+options.MaxFunEvals=1000;
+
+for i=1:40
+    x = minFunc(@lol,phi(:),options);
+    surf(reshape(x,M,N));
+    phi = -ones(M,N);
+    phi(x>=0) = 1;
+    phi = init(phi)/(20-0.5*i+0.1);
+    pause(0.1);
+end
