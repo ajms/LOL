@@ -19,7 +19,7 @@ u0 = double(rgb2gray(RGB))/255;
 
 % parameters
 circle = 1;
-plt = 1;
+plt = 0;
 h = 1.0;
 dt = 0.1;
 di = 0.5;
@@ -27,11 +27,11 @@ lambda1 = 1;
 lambda2 = 1;
 mu = 0;%0.01*255^2;
 nu = 0;
-sigma = 0.5;
+sigma = 2;
 beta = 0.01;
 doreinit = 0;
 
-usmooth = real(ifftn(scalen(fftn(u0),[2,2],[0,0])));
+usmooth = real(ifftn(scalen(fftn(u0),[sigma,sigma],[0,0])));
 umin = floor(min(usmooth(:)));
 umax = ceil(max(usmooth(:)));
 uinc = (umax-umin)/100;
@@ -41,7 +41,7 @@ umean = mean(usmooth(:));
 phi = -ones(M,N);
 if circle == 1
     [X Y] = meshgrid(1:M);
-    phip = (X-50).^2 + (Y-50).^2; 
+    phip = (X-50).^2 + (Y-30).^2; 
     phi(phip <= 20^2) = 1;
 elseif circle == 0
     phip = zeros(M,N);
@@ -49,12 +49,14 @@ elseif circle == 0
         phip = phip + PW(i,0.005,usmooth);
     end
     phi(phip >= 0.5) = 1;
+elseif circle == -1
+    phi = usmooth-mean(usmooth(:));
 end    
 
 phi = init(phi);
 
 options.Method = 'sd';
-figure
+%figure
 if plt == 1
     subplot(2,2,1);
     hold on;
@@ -67,18 +69,18 @@ if plt == 1
     hold off;
 end
 
-%phi = phi/(max(phi(:))-min(phi(:)));
+phi = phi/(max(phi(:))-min(phi(:)));
 F = ones(M*N,1);
 tic;
-for i=1:300
+for i=1:100
+    gamma = 100;
     tempF = F;
-    phi = phi/(max(phi(:))-min(phi(:)));
-    %x = minFunc(@lollin,phi(:),options,usmooth);
+    %x = minFunc(@lol,phi(:),options,usmooth,lambda1,lambda2,nu);
     [F, dF] = lol(phi(:),usmooth,lambda1,lambda2,nu);
-    x = phi(:)-100000*dF;
+    x = phi(:)-gamma*dF;
     if plt == 1
         subplot(2,2,2);
-        surf(reshape(-dF,M,N));
+        surf(reshape(-gamma*dF,M,N));
         subplot(2,2,3);
         surf(reshape(x,M,N));
         colorbar();
@@ -86,7 +88,7 @@ for i=1:300
         title('Final levelset');
         subplot(2,2,4);
         hold on;
-        imagesc(u0);
+        imagesc(usmooth);
         [G H] = contour(reshape(phi,M,N), [0 0]);
         set(H,'LineWidth',3);
         title('Final contour and original image');
@@ -98,10 +100,11 @@ for i=1:300
     %phi = -ones(M,N);
     %phi(x>=0) = 1;
     %phi = init(phi);
+    %phi = phi/(max(phi(:))-min(phi(:)));
     diffF = norm(F-tempF);
     diffdF = norm(dF);
-    fprintf('Iteration: %d, difference: %f, %f\n ', i, diffF, diffdF);
-    if  diffF < 0.0001 &&  diffdF < 0.0001
+    fprintf('Iteration: %d, difference: %f, F=%f\n ', i, diffdF, F);
+    if  diffF < 0.0001 &&  diffdF < 0.0001 && norm(dF) <0.01
        fprintf('Done after %d iterations!\n\n',i-1);
        break;
     end
@@ -113,6 +116,7 @@ if plt == 0
     [H I] = contour(reshape(phi,M,N), [0 0]);
     axis tight;
     hold off;
+    pause(5);
+    surf(reshape(x,M,N));
 end
-for i=1:M*N
-    
+ 

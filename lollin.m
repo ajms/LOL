@@ -6,22 +6,20 @@ function [ cost, dcost ] = lollin ( phi, I, lambda1, lambda2, nu )
     mu1 = mean(u(phi>=0));
     mu2 = mean(u(phi<0));
     mom = 2;
-    for i = 2:M*N-1
-        phiv = phi(i);
+    for i = 1:M*N
+        t = phi(i);
         iv = u(i);
-        basis = floor(phiv);
-        t = phiv-basis;
-        p = [1-t t];
+        tj = floor(t);
+        p = [(t-tj) (tj+1-t)];
         dp = [-1 1];
         for k = 0:1
-            if basis+k >= 0
-                cost = cost + (iv-mu1)^2 * p(k+1) + nu * p(k+1);
-                dcost(i,1) = dcost(i,1) + lambda1*abs(iv-mu1)^mom * dp(k+1) + nu * dp(k+1);
-            elseif basis+k < 0
-                cost = cost+ lambda2*(iv-mu2)^2*p(k+1);
-                dcost(i,1) = dcost(i,1) + lambda2*abs(iv-mu2)^mom * dp(k+1);
+            if tj+k >= 0
+                cost = cost + lambda1*(iv-mu1)^mom * p(k+1) + nu * p(k+1);
+                dcost(i) = dcost(i) + lambda1*abs(iv-mu1)^mom * dp(k+1) + nu * dp(k+1);
+            elseif tj+k < 0
+                cost = cost + lambda2*(iv-mu2)^mom*p(k+1);
+                dcost(i) = dcost(i) + lambda2*abs(iv-mu2)^mom * dp(k+1);
             end
         end
     end
 end
-
