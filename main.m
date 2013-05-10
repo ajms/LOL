@@ -15,7 +15,7 @@ end
 [M, N] = size(I);
 
 % parameters
-plt = 1;
+plt = 0;
 gamma = 100;
 lambda1 = 1;
 lambda2 = 1;
@@ -50,11 +50,11 @@ diffF = zeros(500,1);
 normdF = zeros(500,1);
 dF = 0;
 tic;
-for i=1:100
+for i=1:500
     [F(i+1,1), dF] = lol(phi(:),Ismooth,lambda1,lambda2,mu,nu);
     %dF = minFunc(@lol,phi(:),options,Ismooth,lambda1,lambda2,mu,nu);
     x = phi(:)-gamma*dF;
-    x = dF;
+    %x = dF;
     if plt == 1
         subplot(2,2,2);
         surf(reshape(-gamma*dF,M,N));
