@@ -1,15 +1,14 @@
 function [ F, dF, ddF ] = lol ( phi, I, lambda1, lambda2, mu, nu )
-    u = I(:);
     F = 0;
     [M, N] = size(phi);
     dF = zeros(M*N,1);
-    mu1 = mean(u(phi>=0));
-    mu2 = mean(u(phi<0));
+    mu1 = mean(I(phi>=0));
+    mu2 = mean(I(phi<0));
     mom = 2;
 
     for i = 1:M*N
         phiv = phi(i);
-        iv = u(i);
+        iv = I(i);
         basis = floor(phiv);
         t = phiv-basis;
         p = 1/6*[-t^3+3*t^2-3*t+1 3*t^3-6*t^2+4 -3*t^3+3*t^2+3*t+1 t^3];
