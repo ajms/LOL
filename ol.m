@@ -1,11 +1,28 @@
-function [ F, dF, ddF ] = lol ( phi, I, lambda1, lambda2, mu, nu )
+function [ F, dF ] = ol ( phi, I, lambda1, lambda2, mu, nu )
+% Function to calculate the value of the functional F and the
+% derivatives.
+%      [ F, dF ] = ol ( phi, I, lambda1, lambda2, mu, nu ) returns
+%      a scalar value of the functional F and a matrix of
+%      derivatives in every point of the image
+%
+%      Input: 
+%      - phi: levelset function
+%      - I: image
+%      - lambda1,lambda2: parameters to weight the inner and outer
+%      segments respectively
+%      - mu: parameter to weight the length regularization
+%      - nu: parameter to weight the area regularization
+    
+    % define variables
     F = 0;
     [M, N] = size(phi);
     dF = zeros(M*N,1);
     mu1 = mean(I(phi>=0));
     mu2 = mean(I(phi<0));
     mom = 2;
-
+    
+    % iteration through the image calculating the value of F and
+    % the derivatives in every point.
     for i = 1:M*N
         phiv = phi(i);
         iv = I(i);
