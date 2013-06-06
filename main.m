@@ -1,7 +1,7 @@
 close all;
 
 % Import image
-I = rgb2gray(imread('/path/to/image.jpg'));
+%I = rgb2gray(imread('/path/to/image.jpg'));
 
 % Check image dimensions.
 if ndims(I) == 3
@@ -11,7 +11,7 @@ else
 end
 
 % Parameters
-no = '10'; % number of image for figures
+no = '0'; % number of image for figures
 maxit = 100; % maximal number of iterations
 gamma = 10; % size of steepest descent step
 lambda1 = 1; % parameter weigting the inner segment
@@ -19,7 +19,7 @@ lambda2 = 1; % parameter weigting the outer segment
 mu = 0; % parameter weighting the length regularization
 nu = 0; % parameter weighting the area regularization
 sigma = 1; % parameter for Gaussian kernel
-m =30; % size of circle for initial phi
+m =50; % size of circle for initial phi
 options.Method = 'lbgfs'; % optimization method for calculations
                           % using the length regularization
 
@@ -54,6 +54,7 @@ else
     colormap('gray');
     contour(reshape(phi,M,N), [0 0], 'Color', [1 0 0],'LineWidth',3);
     axis tight;
+    set(gca,'YDir','Reverse');
     print(initial,'-dpsc',strcat('I',no,'init.eps'));
 end
 
@@ -99,6 +100,7 @@ if ndims(I) == 2
     colormap('gray');
     contour(reshape(phi,M,N), [0 0], 'Color', [1 0 0],'LineWidth',3);
     axis tight;
+    set(gca,'YDir','Reverse');
     hold off;
     print(seg,'-dpsc',strcat('I',no,'seg.eps'));
 end
